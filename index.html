@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFR SOLVER</title>
+    <!-- Math.js লাইব্রেরি যোগ করা হয়েছে -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
+    <style>
+        body {
+            font-family: 'SolaimanLipi', 'Siyam Rupali', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #87CEEB;
+            color: #333;
+        }
+        h1, h2 {
+            color: #90EE90;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #90EE90;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+        button:hover {
+            background-color: #008888;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            min-height: 100px;
+        }
+        .examples {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+        .step {
+            margin-bottom: 10px;
+            padding-left: 15px;
+            border-left: 3px solid #006666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>গণিত সমাধানকারী</h1>
+        <h2>বীজগণিত ও জ্যামিতি সমস্যার সমাধান (Math.js ব্যবহার করে)</h2>
+        
+        <textarea id="mathProblem" placeholder="আপনার গণিত সমস্যা বাংলায় লিখুন, যেমন: 'x² + 5x + 6 = 0 সমীকরণের সমাধান করুন' বা 'sin(π/2) + log(100) এর মান কত?'"></textarea>
+        
+        <button onclick="solveMath()">সমাধান করুন</button>
+        
+        <div id="result">সমাধান এখানে দেখানো হবে...</div>
+        
+        <div class="examples">
+            <h3>উদাহরণ:</h3>
+            <ul>
+                <li>2x + 5 = 15 হলে x এর মান কত?</li>
+                <li>x² - 4x + 4 = 0 সমীকরণের সমাধান করুন</li>
+                <li>sin(π/2) + cos(0) এর মান কত?</li>
+                <li>একটি ত্রিভুজের ভূমি ১০ সেমি এবং উচ্চতা ৮ সেমি হলে ক্ষেত্রফল কত?</li>
+                <li>log(100, 10) + sqrt(16) এর মান কত?</li>
+                <li>det([ [1, 2], [3, 4] ]) এর মান নির্ণয় করুন</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function solveMath() {
+            const problem = document.getElementById('mathProblem').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!problem) {
+                resultDiv.innerHTML = "দয়া করে একটি গণিত সমস্যা লিখুন।";
+                return;
+            }
+            
+            resultDiv.innerHTML = "সমাধান করা হচ্ছে...";
+            
+            setTimeout(() => {
+                try {
+                    let solution = "";
+                    
+                    // Try to evaluate mathematical expressions
+                    if (problem.includes('=')) {
+                        // Handle equations
+                        solution = solveEquation(problem);
+                    } else {
+                        // Handle direct expressions
+                        solution = evaluateExpression(problem);
+                    }
+                    
+                    resultDiv.innerHTML = solution;
+                } catch (error) {
+                    resultDiv.innerHTML = `<p>সমস্যা সমাধানে ত্রুটি: ${error.message}</p>
+                    <p>দয়া করে নিম্নলিখিত ফরম্যাটে সমস্যা লিখুন:</p>
+                    <ul>
+                        <li>সরল সমীকরণ: "2x + 5 = 15"</li>
+                        <li>দ্বিঘাত সমীকরণ: "x^2 - 4x + 4 = 0"</li>
+                        <li>গাণিতিক এক্সপ্রেশন: "sin(pi/2) + log(100, 10)"</li>
+                        <li>ম্যাট্রিক্স: "det([ [1, 2], [3, 4] ])"</li>
+                    </ul>`;
+                }
+            }, 500);
+        }
+
+        function evaluateExpression(expr) {
+            // Replace Bengali characters with English equivalents for math.js
+            const englishExpr = expr.replace(/π/g, 'pi')
+                                   .replace(/√/g, 'sqrt')
+                                   .replace(/²/g, '^2')
+                                   .replace(/³/g, '^3');
+            
+            const result = math.evaluate(englishExpr);
+            
+            let solution = `<p><strong>অভিব্যক্তি:</strong> ${expr}</p>`;
+            solution += `<div class="step"><strong>ধাপ ১:</strong> অভিব্যক্তিটি প্রক্রিয়াকরণ: ${englishExpr}</div>`;
+            solution += `<div class="step"><strong>ধাপ ২:</strong> গণনা সম্পন্ন</div>`;
+            solution += `<p><strong>ফলাফল:</strong> ${expr} = <strong>${result}</strong></p>`;
+            
+            return solution;
+        }
+
+        function solveEquation(equation) {
+            let solution = `<p><strong>সমীকরণ:</strong> ${equation}</p>`;
+            
+            // Linear equation: ax + b = c
+            if (equation.match(/^[0-9]*x\s*[+-]\s*[0-9]+\s*=\s*[0-9]+$/)) {
+                const parts = equation.split('=');
+                const left = parts[0].trim();
+                const right = parts[1].trim();
+                
+                // Parse ax + b
+                const leftParts = left.split(/([+-])/);
+                const a = parseFloat(leftParts[0].replace('x', '')) || 1;
+                const op = leftParts[1];
+                const b = parseFloat(leftParts[2]);
+                
+                const c = parseFloat(right);
+                
+                solution += `<div class="step"><strong>ধাপ ১:</strong> সমীকরণটি সাজানো: ${a}x ${op} ${b} = ${c}</div>`;
+                
+                let steps = "";
+                let xValue;
+                
+                if (op === '+') {
+                    steps += `<div class="step">${a}x = ${c} - ${b}</div>`;
+                    steps += `<div class="step">${a}x = ${c - b}</div>`;
+                    steps += `<div class="step">x = ${c - b} / ${a}</div>`;
+                    xValue = (c - b) / a;
+                } else {
+                    steps += `<div class="step">${a}x = ${c} + ${b}</div>`;
+                    steps += `<div class="step">${a}x = ${c + b}</div>`;
+                    steps += `<div class="step">x = ${c + b} / ${a}</div>`;
+                    xValue = (c + b) / a;
+                }
+                
+                solution += steps;
+                solution += `<p><strong>সমাধান:</strong> x = <strong>${xValue}</strong></p>`;
+            }
+            // Quadratic equation: ax² + bx + c = 0
+            else if (equation.match(/x²|x\^2/)) {
+                // Convert to math.js format
+                const quadEq = equation.replace('x²', 'x^2')
+                                      .replace(/=/g, '==')
+                                      .replace(/π/g, 'pi');
+                
+                try {
+                    const solutions = math.solve(quadEq, 'x');
+                    
+                    solution += `<div class="step"><strong>ধাপ ১:</strong> সমীকরণটি সনাক্তকরণ: দ্বিঘাত সমীকরণ</div>`;
+                    solution += `<div class="step"><strong>ধাপ ২:</strong> সূত্র প্রয়োগ: x = [-b ± √(b²-4ac)] / 2a</div>`;
+                    
+                    if (solutions.length === 1) {
+                        solution += `<p><strong>সমাধান:</strong> x = <strong>${solutions[0]}</strong> (একটি বাস্তব সমাধান)</p>`;
+                    } else {
+                        solution += `<p><strong>সমাধান:</strong> x = <strong>${solutions[0]}</strong> এবং x = <strong>${solutions[1]}</strong></p>`;
+                    }
+                } catch (error) {
+                    solution += `<p>দ্বিঘাত সমীকরণ সমাধানে ত্রুটি: ${error.message}</p>`;
+                }
+            }
+            // Other equations that math.js can solve
+            else if (equation.includes('x')) {
+                try {
+                    const eq = equation.replace(/=/g, '==')
+                                      .replace(/π/g, 'pi')
+                                      .replace(/²/g, '^2')
+                                      .replace(/³/g, '^3');
+                    
+                    const solutions = math.solve(eq, 'x');
+                    
+                    solution += `<div class="step"><strong>ধাপ ১:</strong> সমীকরণটি প্রক্রিয়াকরণ</div>`;
+                    
+                    if (solutions.length === 1) {
+                        solution += `<p><strong>সমাধান:</strong> x = <strong>${solutions[0]}</strong></p>`;
+                    } else if (solutions.length > 1) {
+                        solution += `<p><strong>সমাধান:</strong>`;
+                        solution += `<ul>`;
+                        solutions.forEach((sol, i) => {
+                            solution += `<li>x${i+1} = <strong>${sol}</strong></li>`;
+                        });
+                        solution += `</ul></p>`;
+                    } else {
+                        solution += `<p>সমীকরণের কোনো সমাধান পাওয়া যায়নি</p>`;
+                    }
+                } catch (error) {
+                    solution += `<p>সমীকরণ সমাধানে ত্রুটি: ${error.message}</p>`;
+                }
+            } else {
+                solution += `<p>এই ধরনের সমীকরণ সমাধানের সুবিধা এখনও যোগ করা হয়নি</p>`;
+            }
+            
+            return solution;
+        }
+    </script>
+</body>
+</html>
